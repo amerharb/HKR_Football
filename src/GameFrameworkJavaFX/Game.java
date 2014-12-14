@@ -9,9 +9,15 @@ package GameFrameworkJavaFX;
 import Actors.Actor;
 import Actors.Actor.ActorDirectionEnum;
 import Actors.Ball;
-import Actors.GoalKeeper;
+import Actors.ComputerGoalKeeper;
+import Actors.ComputerPlayer;
+import Actors.HumanGoalKeeper;
+import Actors.HumanPlayer;
 import Actors.Player;
+import Actors.Player.PlayerPositionEnum;
 import Actors.Team;
+import Actors.ComputerTeam;
+import Actors.HumanTeam;
 import Actors.Team.TeamKindEnum;
 import java.awt.BorderLayout;
 import java.util.ArrayList;        
@@ -68,13 +74,12 @@ public class Game {
     
     private final ArrayList<Actor> actors;
     //private final Player[] blueTeam = new Player[6]; //array that stores 6 blue team players
-    private Team blueTeam;
-    //AMER CODE: 1 line, belive me its will be good :)
-    private GoalKeeper blueKeeper ;
+    private HumanTeam blueTeam;
+    private HumanGoalKeeper blueKeeper ;
     
     //private final Player[] redTeam = new Player[6]; //array that stores 6 red team players
-    private Team redTeam;    //AMER CODE:  1 line
-    private GoalKeeper redKeeper;
+    private ComputerTeam redTeam;    
+    private ComputerGoalKeeper redKeeper;
 
     //AMER CODE:
     private Player[] bothTeams; // to be used if we want to prefourm an actoin to all players one time
@@ -83,6 +88,7 @@ public class Game {
         this.gui = gui;        
         actors = new ArrayList();
         createActors();
+        HideActors(); //so the Intro Screen will be appear
         playSFX(GameSoundFXEnum.Intro);
         gui.showIntrolBoard();
     }
@@ -104,26 +110,27 @@ public class Game {
 
         bothTeams = new Player[12];
         int x = 0;
-        Player NewP;
+        HumanPlayer NewBP;
+        ComputerPlayer NewRP;
         for (int i=0; i<5; i++) { //add 5 player in each team
-            NewP = new Player(blueTeam);
-            blueTeam.Players[i] = NewP;
-            NewP.setPlayerTeam(blueTeam);
-            NewP.setBall(ball); //define game ball
-            addToWorld(NewP);
-            bothTeams[x] = NewP;
+            NewBP = new HumanPlayer(blueTeam);
+            blueTeam.Players[i] = NewBP;
+            NewBP.setPlayerTeam(blueTeam);
+            NewBP.setBall(ball); //define game ball
+            addToWorld(NewBP);
+            bothTeams[x] = NewBP;
             x++;
             
-            NewP = new Player(redTeam); 
-            redTeam.Players[i] = NewP; 
-            NewP.setPlayerTeam(redTeam);
-            NewP.setBall(ball); //define game ball
-            addToWorld(NewP);
-            bothTeams[x] = NewP;
+            NewRP = new ComputerPlayer(redTeam); 
+            redTeam.Players[i] = NewRP; 
+            NewRP.setPlayerTeam(redTeam);
+            NewRP.setBall(ball); //define game ball
+            addToWorld(NewRP);
+            bothTeams[x] = NewRP;
             x++;
         }
 
-        blueKeeper = new GoalKeeper(blueTeam);
+        blueKeeper = new HumanGoalKeeper(blueTeam);
         blueKeeper.setPlayerTeam(blueTeam);
         blueKeeper.setBall(ball);
         blueTeam.Players[5] = blueKeeper;
@@ -131,7 +138,7 @@ public class Game {
         bothTeams[x]= blueKeeper;
         x++;
         
-        redKeeper = new GoalKeeper(blueTeam);
+        redKeeper = new ComputerGoalKeeper(blueTeam);
         redKeeper.setPlayerTeam(redTeam);
         redKeeper.setBall(ball);
         redTeam.Players[5] = redKeeper;
@@ -218,21 +225,21 @@ public class Game {
             B.setHasBall(false);
         }
         blueTeam.Players[0].setLocation(200, 150);
-        blueTeam.Players[0].setPosition("LeftBack");
+        blueTeam.Players[0].setPosition(PlayerPositionEnum.LeftBack);
         blueTeam.Players[1].setLocation(200, 450);
-        blueTeam.Players[1].setPosition("RightBack");
+        blueTeam.Players[1].setPosition(PlayerPositionEnum.RightBack);
         blueTeam.Players[2].setLocation(400, 335);
-        blueTeam.Players[2].setPosition("CentreMidfield");
+        blueTeam.Players[2].setPosition(PlayerPositionEnum.CentreMidfield);
         blueTeam.Players[3].setLocation(660, 340);
         blueTeam.Players[3].getImageView().setRotate(270);
-        blueTeam.Players[3].setPosition("InsideRight");
+        blueTeam.Players[3].setPosition(PlayerPositionEnum.InsideRight);
         setPlayerInControl(blueTeam.Players[3]);
         setPlayerWithBall(blueTeam.Players[3]);
         blueTeam.Players[4].setLocation(660, 290);
         blueTeam.Players[4].getImageView().setRotate(90);
-        blueTeam.Players[4].setPosition("InsideLeft");
+        blueTeam.Players[4].setPosition(PlayerPositionEnum.InsideLeft);
         blueTeam.Players[5].setLocation(90, 320);
-        blueTeam.Players[5].setPosition("Keeper");
+        blueTeam.Players[5].setPosition(PlayerPositionEnum.Keeper);
 
         for (Player R: redTeam.Players) {
             R.getImageView().setScaleX(-1);
@@ -240,17 +247,17 @@ public class Game {
             R.setHasBall(false);
         }
         redTeam.Players[0].setLocation(800, 150);
-        redTeam.Players[0].setPosition("RightMidfield");
+        redTeam.Players[0].setPosition(PlayerPositionEnum.RightMidfield);
         redTeam.Players[1].setLocation(800, 500);
-        redTeam.Players[1].setPosition("LeftMidfield");
+        redTeam.Players[1].setPosition(PlayerPositionEnum.LeftMidfield);
         redTeam.Players[2].setLocation(1050, 100);
-        redTeam.Players[2].setPosition("RightBack");
+        redTeam.Players[2].setPosition(PlayerPositionEnum.RightBack);
         redTeam.Players[3].setLocation(1050, 450);
-        redTeam.Players[3].setPosition("LeftBack");
+        redTeam.Players[3].setPosition(PlayerPositionEnum.LeftBack);
         redTeam.Players[4].setLocation(800, 340);
-        redTeam.Players[4].setPosition("Striker");
+        redTeam.Players[4].setPosition(PlayerPositionEnum.CentreMidfield);
         redTeam.Players[5].setLocation(1320, 330);
-        redTeam.Players[5].setPosition("Keeper");
+        redTeam.Players[5].setPosition(PlayerPositionEnum.Keeper);
     
     }
     
@@ -264,36 +271,36 @@ public class Game {
         }
         
         blueTeam.Players[0].setLocation(200, 150);
-        blueTeam.Players[0].setPosition("LeftBack");
+        blueTeam.Players[0].setPosition(PlayerPositionEnum.LeftBack);
         blueTeam.Players[1].setLocation(200, 450);
-        blueTeam.Players[1].setPosition("RightBack");
+        blueTeam.Players[1].setPosition(PlayerPositionEnum.RightBack);
         blueTeam.Players[2].setLocation(400, 335);
-        blueTeam.Players[2].setPosition("CentreMidfield");
+        blueTeam.Players[2].setPosition(PlayerPositionEnum.CentreMidfield);
         blueTeam.Players[3].setLocation(600, 450);
-        blueTeam.Players[3].setPosition("InsideRight");
+        blueTeam.Players[3].setPosition(PlayerPositionEnum.InsideRight);
         setPlayerInControl(blueTeam.Players[3]);
         blueTeam.Players[4].setLocation(600, 150);
-        blueTeam.Players[4].setPosition("InsideLeft");
+        blueTeam.Players[4].setPosition(PlayerPositionEnum.InsideLeft);
         blueTeam.Players[5].setLocation(90, 320);
-        blueTeam.Players[5].setPosition("Keeper");
+        blueTeam.Players[5].setPosition(PlayerPositionEnum.Keeper);
 
         for (Player R: redTeam.Players) {
             R.stop(ActorDirectionEnum.West);
             R.setHasBall(false);
         }
         redTeam.Players[0].setLocation(800, 150);
-        redTeam.Players[0].setPosition("RightMidfield");
+        redTeam.Players[0].setPosition(PlayerPositionEnum.RightMidfield);
         redTeam.Players[1].setLocation(800, 500);
-        redTeam.Players[1].setPosition("LeftMidfield");
+        redTeam.Players[1].setPosition(PlayerPositionEnum.LeftMidfield);
         redTeam.Players[2].setLocation(1050, 100);
-        redTeam.Players[2].setPosition("RightBack");
+        redTeam.Players[2].setPosition(PlayerPositionEnum.RightBack);
         redTeam.Players[3].stop(ActorDirectionEnum.North,660, 330);
         setPlayerWithBall(redTeam.Players[3]);
-        redTeam.Players[3].setPosition("LeftBack");
+        redTeam.Players[3].setPosition(PlayerPositionEnum.LeftBack);
         redTeam.Players[4].stop(ActorDirectionEnum.South,660, 290);
-        redTeam.Players[4].setPosition("Striker");
+        redTeam.Players[4].setPosition(PlayerPositionEnum.Striker);
         redTeam.Players[5].setLocation(1320, 330);
-        redTeam.Players[5].setPosition("Keeper");
+        redTeam.Players[5].setPosition(PlayerPositionEnum.Keeper);
     
     }
     
@@ -350,17 +357,17 @@ public class Game {
         blueTeam.Players[1].setLocation(800, 450);
         blueTeam.Players[2].setLocation(1050, 150);
         blueTeam.Players[3].stop(ActorDirectionEnum.North,660, 340 );
-        blueTeam.Players[3].setPosition("InsideRight");
+        blueTeam.Players[3].setPosition(PlayerPositionEnum.InsideRight);
         setPlayerInControl(blueTeam.Players[3]);
         setPlayerWithBall(blueTeam.Players[3]);
         blueTeam.Players[4].stop(ActorDirectionEnum.East, 660, 290);
-        blueTeam.Players[4].setPosition("InsideLeft");
+        blueTeam.Players[4].setPosition(PlayerPositionEnum.InsideLeft);
         blueTeam.Players[5].setLocation(1320, 330);
     }
     
-    private void throwInPositions(int x, int y) {
-        /*positions for players to take from throw in. takes the ball location as parameters from the checkForThrowIns()
-        method, and uses them to set location of blue team and red team player number 3, who receive the throw in*/
+    private void throwInPositions() {
+        int x = ball.getX(), y = ball.getY();
+        
         if (checkTime() == GameTimeEnum.FirstHalf){
             blueTeam.Players[0].setLocation(200, 150);
             blueTeam.Players[1].setLocation(200, 450);
@@ -501,48 +508,15 @@ public class Game {
         //goal keeper save mode override UnCollidablility
         if (ball.getUnCollidable() && blueKeeper.getKeeperSave() && blueKeeper.collidesWith(ball)) {
             if (checkTime() == GameTimeEnum.FirstHalf){
-                ball.setSpeedX(5);
+                ball.setSpeedAndDirection(4, ActorDirectionEnum.NorthEast);
             }
             else if (checkTime() == GameTimeEnum.FirstHalf){
-                ball.setSpeedY(-5);
+                ball.setSpeedAndDirection(4, ActorDirectionEnum.NorthWest);
             }
-            ball.setSpeedY(-5);
             blueKeeper.setKeeperSave(false);
             blueKeeper.setHasBall(false);
         }
         
-        //old code
-//        for (int i=0; i<6; i++ ) {
-//            if (blueTeam.Players[i].getHasBall() == false && blueTeam.Players[i].collidesWith(ball) && 
-//                blueTeam.Players[i].getUnCollidable() == false && ball.getUnCollidable() == false) {
-//                //blueTeam.Players[i].setHasBall(true);
-//                setPlayerWithBall(blueTeam.Players[i]);
-//                blueTeam.Players[i].setUnderControl(true);
-//            }
-//            if (redTeam.Players[i].getHasBall() == false && redTeam.Players[i].collidesWith(ball) && redTeam.Players[i].getUnCollidable() == false && ball.getUnCollidable() == false) {
-//                //redTeam[i].setHasBall(true);
-//                setPlayerWithBall(redTeam.Players[i]);
-//                
-//            } 
-//            if (blueTeam.Players[i].getHasBall() == true && blueTeam.Players[i].getUnCollidable() == false) {
-//                travelWithBall(blueTeam.Players[i]);
-//            }
-//            
-//            if (redTeam.Players[i].getHasBall() == true && redTeam.Players[i].getUnCollidable() == false) {
-//                travelWithBall(redTeam.Players[i]);
-//            }
-//        }
-//        if (ball.getUnCollidable() == true && blueKeeper.getKeeperSave() == true && blueKeeper.collidesWith(ball)) {
-//            //blueTeam[5].setHasBall(true);
-//            //trapBall(ball, blueTeam[5]);
-//            //blueTeam[5].setUnderControl(true);
-//            //blueTeam[5].setKeeperSave(false);
-//            ball.setSpeedX(5);
-//            ball.setSpeedY(-5);
-//            //AMER CODE:
-//            //blueTeam[5].setKeeperSave(false);
-//            blueKeeper.setKeeperSave(false);
-//        }
     }
     
     private GameTimeEnum checkTime(){ //this proc return 0 if time isi over, 1 for first half, and 2 for 2nd half
@@ -566,18 +540,16 @@ public class Game {
                 gui.stopGameTime();
                 gui.showMenuButtonWithText("THROW-IN to blue team");
                 ball.setLocation(ball.getX(), 5);
-                throwInPositions(ball.getX(), ball.getY());
-                ball.setSpeedX((blueTeam.Players[3].getX() - ball.getX())/30);
-                ball.setSpeedY((blueTeam.Players[3].getY() - ball.getY())/30);
+                throwInPositions();
+                ball.gotoPlayer(blueTeam.Players[3]);
             }
             if(ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
                 gui.stopWorldTime();
                 gui.stopGameTime();
                 gui.showMenuButtonWithText("THROW-IN to red team");
                 ball.setLocation(ball.getX(), 5);
-                throwInPositions(ball.getX(), ball.getY());
-                ball.setSpeedX((redTeam.Players[3].getX() - ball.getX())/30);
-                ball.setSpeedY((redTeam.Players[3].getY() - ball.getY())/30);
+                throwInPositions();
+                ball.gotoPlayer(redTeam.Players[3]);
             }
             return true;
         }
@@ -587,18 +559,16 @@ public class Game {
                 gui.stopGameTime();
                 gui.showMenuButtonWithText("THROW-IN to blue team");
                 ball.setLocation(ball.getX(), 665);
-                throwInPositions(ball.getX(), ball.getY());
-                ball.setSpeedX((blueTeam.Players[3].getX() - ball.getX())/30);
-                ball.setSpeedY((blueTeam.Players[3].getY() - ball.getY())/30);
+                throwInPositions();
+                ball.gotoPlayer(blueTeam.Players[3]);
             }
             else if(ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
                 gui.stopWorldTime();
                 gui.stopGameTime();
                 gui.showMenuButtonWithText("THROW-IN to red team");
                 ball.setLocation(ball.getX(), 665);
-                throwInPositions(ball.getX(), ball.getY());
-                ball.setSpeedX((redTeam.Players[3].getX() - ball.getX())/30);
-                ball.setSpeedY((redTeam.Players[3].getY() - ball.getY())/30);
+                throwInPositions();
+                ball.gotoPlayer(redTeam.Players[3]);
             }
             return true;
         }
@@ -607,48 +577,46 @@ public class Game {
     
     private boolean checkForGoalKicks() {
         //called in timeTick(), checks for goal kicks
-        if (ball.getX() <= 15 && ball.getY() < 300) {
-            if(ball.getWhoHadBallLast() == TeamKindEnum.RedTeam) {
-                gui.stopWorldTime();
-                gui.stopGameTime();
-                gui.showMenuButtonWithText("GOAL KICK");
-                ball.setLocation(90, 220);
-                blueKeeper.setLocation(88, 220);
-                goalKickPositions();
-            }
+        if (ball.getX() <= 15 && ball.getY() < 300 && 
+            ball.getWhoHadBallLast() == TeamKindEnum.RedTeam) {
+            
+            gui.stopWorldTime();
+            gui.stopGameTime();
+            gui.showMenuButtonWithText("GOAL KICK");
+            ball.setLocation(90, 220);
+            blueKeeper.setLocation(88, 220);
+            goalKickPositions();
             return true;
         }
-        else if (ball.getX() <= 15 && ball.getY() > 380) {
-            if(ball.getWhoHadBallLast() == TeamKindEnum.RedTeam) {
-                gui.stopWorldTime();
-                gui.stopGameTime();
-                gui.showMenuButtonWithText("GOAL KICK");
-                ball.setLocation(90, 400);
-                blueKeeper.setLocation(88, 400);
-                goalKickPositions();
-            }
+        else if (ball.getX() <= 15 && ball.getY() > 380 &&
+                 ball.getWhoHadBallLast() == TeamKindEnum.RedTeam) {
+            
+            gui.stopWorldTime();
+            gui.stopGameTime();
+            gui.showMenuButtonWithText("GOAL KICK");
+            ball.setLocation(90, 400);
+            blueKeeper.setLocation(88, 400);
+            goalKickPositions();
             return true;
         }
-        else if (ball.getX() >= 1325 && ball.getY() > 380) {
-            if(ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
-                gui.stopWorldTime();
-                gui.stopGameTime();
-                gui.showMenuButtonWithText("GOAL KICK");
-                ball.setLocation(1240, 400);
-                redTeam.Players[5].setLocation(1242, 400);
-                goalKickPositions();
-            }
+        else if (ball.getX() >= 1325 && ball.getY() > 380 && 
+                 ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
+            gui.stopWorldTime();
+            gui.stopGameTime();
+            gui.showMenuButtonWithText("GOAL KICK");
+            ball.setLocation(1240, 400);
+            redTeam.Players[5].setLocation(1242, 400);
+            goalKickPositions();
             return true;
         }
-        else if (ball.getX() >= 1325 && ball.getY() < 300) {
-            if(ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
-                gui.stopWorldTime();
-                gui.stopGameTime();
-                gui.showMenuButtonWithText("GOAL KICK");
-                ball.setLocation(1240, 220);
-                redTeam.Players[5].setLocation(1242, 220);
-                goalKickPositions();
-            }
+        else if (ball.getX() >= 1325 && ball.getY() < 300 &&
+                 ball.getWhoHadBallLast() == TeamKindEnum.BlueTeam) {
+            gui.stopWorldTime();
+            gui.stopGameTime();
+            gui.showMenuButtonWithText("GOAL KICK");
+            ball.setLocation(1240, 220);
+            redTeam.Players[5].setLocation(1242, 220);
+            goalKickPositions();
             return true;
         }
         else {return false;}
@@ -671,6 +639,7 @@ public class Game {
             gui.showMenuButtonWithText("GOAL!!!");
             setPlayerInStartPositions();
             playSFX(GameSoundFXEnum.Goal);
+            
             return true;
         }
         else {return false;}
@@ -757,8 +726,7 @@ public class Game {
     }
     
     private void travelWithBall(Player player) {
-        ball.setSpeedX(player.getSpeedX());
-        ball.setSpeedY(player.getSpeedY());
+        ball.TravelWithPlayer(player);
     }
     
     /*the above two methods are called in checkForCollisions() and are what each player does when they collide with ball.
@@ -776,6 +744,10 @@ public class Game {
         two guys all the time. so instead i wrote this method to put in timeTick() so players pass to specific team mates.
         at the moment, full backs pass to wingers, wingers pass to the striker. 
         */
+        for (ComputerPlayer R:redTeam.Players){
+            
+        }
+        
         for (int i=0; i<5; i++) {
             if(redTeam.Players[0].getPass() == true) {                
                 ball.Pass(redTeam.Players[4].getX(), redTeam.Players[4].getY());
@@ -846,8 +818,8 @@ public class Game {
         System.out.println("Creating actors...");
         
         //init Teams
-        redTeam = new Team(TeamKindEnum.RedTeam);
-        blueTeam = new Team(TeamKindEnum.BlueTeam);
+        redTeam = new ComputerTeam();
+        blueTeam = new HumanTeam();
         
         ball = new Ball();
         ball.setLocation(665, 335);
@@ -1163,6 +1135,7 @@ public class Game {
         else if (id == KeyCode.ENTER) {
             
             gui.ButtomClickHere();
+            ShowActors(); // in case there are hidden from intro.... should be change later
         }
         
 //        else if (id == KeyCode.TAB){
@@ -1265,7 +1238,7 @@ public class Game {
         }
     }
     
-    public void playSFX(GameSoundFXEnum SoundFX)
+    private void playSFX(GameSoundFXEnum SoundFX)
     {
         try
         {
@@ -1273,7 +1246,7 @@ public class Game {
             //SFX: Step 4: add new case for the the switch 
             switch (SoundFX){
                 case Intro:
-                    Player = new MediaPlayer(SFXGoal);
+                    Player = new MediaPlayer(SFXIntro);
                     Player.play();
                     break;
                 case GameOver:
@@ -1291,6 +1264,21 @@ public class Game {
         {
             System.out.println( e.getMessage() );
             System.exit(0);
+        }
+       
+    }
+    
+    private void HideActors(){
+        
+        for (Actor A:actors){
+            A.getImageView().setVisible(false);
+        }
+    }
+
+    private void ShowActors(){
+        
+        for (Actor A:actors){
+            A.getImageView().setVisible(true);
         }
     }
 

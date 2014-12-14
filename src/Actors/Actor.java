@@ -32,7 +32,7 @@ public class Actor {
     protected enum ActorRotationStyle{
         ManualRotation
         ,AutoNormalRotation
-        ,AutoFlipVerticalyThenRotation //its mean to flip the actor if the rotation was more than 90 degree or less than -90
+        ,AutoFlipVerticalyAndRotation //its mean to flip the actor if the rotation was more than 90 degree or less than -90
     }
     
     private ActorDirectionEnum actorDirection = ActorDirectionEnum.East;
@@ -42,7 +42,7 @@ public class Actor {
     private int x;
     private int y;
 
-    private ActorRotationStyle rotationStyle = ActorRotationStyle.AutoFlipVerticalyThenRotation; 
+    private ActorRotationStyle rotationStyle = ActorRotationStyle.AutoFlipVerticalyAndRotation; 
     private ActorDirectionEnum actorRotation = ActorDirectionEnum.East; // this will have meaning only if the autoRotation is Disable
     
     private double collisionRadius = 0.5; 
@@ -226,6 +226,58 @@ public class Actor {
         }
     }
     
+    public void setSpeedAndDirection(int speed, ActorDirectionEnum direction){
+
+        if (speed == 0 || direction == ActorDirectionEnum.None){
+            speed = 0;
+            actorDirection = ActorDirectionEnum.None;
+        }
+        
+        switch (direction){
+            case North:
+                speedY = -speed;
+                speedX = 0;
+                break;
+            case NorthEast:
+                speedY = (int) - Math.sqrt((speed ^ 2) * 2); // x = sqr((speed ^ 2)/2) 
+                speedX = (int) Math.sqrt((speed ^ 2) * 2);
+                break;
+            case East:
+                speedY = 0;
+                speedX = speed;
+                break;
+            case SouthEast:
+                speedY = (int) Math.sqrt((speed ^ 2) * 2);
+                speedX = (int) Math.sqrt((speed ^ 2) * 2);
+                break;
+            case South:
+                speedY = speed;
+                speedX = 0;
+                break;
+            case SouthWest:
+                speedY = (int) Math.sqrt((speed ^ 2) * 2);
+                speedX = (int) - Math.sqrt((speed ^ 2) * 2);
+                break;
+            case West:
+                speedY = 0;
+                speedX = -speed;
+                break;
+            case NorthWest:
+                speedY = (int) - Math.sqrt((speed ^ 2) * 2);
+                speedX = (int) - Math.sqrt((speed ^ 2) * 2);
+                break;
+                
+        }
+      
+        if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyAndRotation)
+            FlipAndRotationBasedOnDirection();
+        
+    }
+    
+    public void ChangeDirection(ActorDirectionEnum newDirection){
+        
+    }
+            
     public void stop()
     {
         //basicly to put both speed in zero
@@ -280,12 +332,12 @@ public class Actor {
         else if (speedY <0 && speedX <0){ //going NorthWest
             actorDirection= ActorDirectionEnum.NorthWest;
         }
-        if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyThenRotation)
-            setRotationBasedOnSpeed();
+        if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyAndRotation)
+            FlipAndRotationBasedOnDirection();
         
     }
     
-    private void setRotationBasedOnSpeed(){
+    private void FlipAndRotationBasedOnDirection(){
         
         switch (actorDirection){
             case None:
@@ -312,7 +364,7 @@ public class Actor {
                 imageView.setScaleX(1);
                 break;
             case SouthWest:
-                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyThenRotation){
+                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyAndRotation){
                     imageView.setRotate(315);
                     imageView.setScaleX(-1);
                 }else if(rotationStyle == ActorRotationStyle.AutoNormalRotation) {
@@ -321,7 +373,7 @@ public class Actor {
                 }
                 break;
             case West:
-                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyThenRotation){
+                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyAndRotation){
                     imageView.setRotate(0);
                     imageView.setScaleX(-1);
                 }else if(rotationStyle == ActorRotationStyle.AutoNormalRotation) {
@@ -330,7 +382,7 @@ public class Actor {
                 }
                 break;
             case NorthWest:
-                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyThenRotation){
+                if (rotationStyle == ActorRotationStyle.AutoFlipVerticalyAndRotation){
                     imageView.setRotate(45);
                     imageView.setScaleX(-1);
                 }else if(rotationStyle == ActorRotationStyle.AutoNormalRotation) {

@@ -17,78 +17,62 @@ import javafx.scene.image.Image;
  */
 public class Player extends Actor{
 
-    /**
-     * @return the PlayerDirection
-     */
     
-    //AMER CODE: these should be private, well no these should not be array at all
-    //old code
-    //Image[] blueTeamimages = new Image[4];
-    //Image[] redTeamimages = new Image[6];
-    //new code
-    private Image bluePlayerImage;
-    private Image blueUndercontrolPlayerImage;
-    private Image blueNearestPlayerImage;
+    private Image PlayerImage;
     
-    private Image redPlayerImage;
+    protected boolean hasBall; //does this player have the ball or not
+    protected boolean underControl; //is this player under user control or not
     
-
-    private boolean hasBall; //does this player have the ball or not
-    private boolean underControl; //is this player under user control or not
-    
-    //AMER CODE: this should be object
     private Player nearestTeamMate;
-    //private String nearestTeamMate = ""; 
-    /* here we store the position name (eg. "RightBack") of the nearest team
-    mate for the user controlled player. this way, each player knows if he is the current nearest team mate, and what
-    his image should be (yellow highlight or not). information is sent through from getNearestMan() method in Game.
-    */
-    //TODO: change it to object Player
-    private String nearestDefender = ""; //was planning to use this field for redTeam, not being used at the moment
-
     
     private boolean UnCollidable; /* if player is uncollidable the ball will not stick to them - they are not included
     in the condition for collision checking in the checkForCollisions() method in Game. this was necessary to create
     a few miliseconds of immunity from collision so passes and shots get away from players properly */
-    //private boolean onRedTeam; //player needs to know which team he's on
-    private boolean pass; //when true, Game will make this player pass, with computerPassingAndShooting() method
-    private boolean shoot; //when true, Game will make this player shoot, with computerPassingAndShooting() method
+
     private TeamKindEnum teamWithBall = TeamKindEnum.NoTeam; //brought in from whichTeamHaveBall() method in Game, so players know
-    private String position = ""; //position player is currently playing, defined in startPositions() method in Game
-    //AMER CODE: NO NEED i user ball object instead
-    //private int ballX; //the current x coordinate of the ball, sent through from Game's timeTick();
-    //private int ballY; //the current x coordinate of the ball, sent through from Game's timeTick();
-    private Ball ball;
+    
+    public enum PlayerPositionEnum{
+        NoPosition
+        ,RightBack
+        ,LeftBack
+        ,RightMidfield
+        ,LeftMidfield
+        ,Striker
+        ,Keeper
+        
+        ,CentreMidfield
+        ,InsideRight
+        ,InsideLeft
+    }
+    
+    private PlayerPositionEnum position = PlayerPositionEnum.NoPosition; //position player is currently playing, defined in startPositions() method in Game
+
+    protected Ball ball;
     
     private int collidabilitycounter = 0; //a counter used in the restoreCollidability() method below
     private int passcounter = 0; //a counter used in the autoPass() method below
     private int shotcounter = 0; //a counter used in the autoShoot() method below
     private Team PlayerTeam;
 
-    private Game.GameTimeEnum GameTime = Game.GameTimeEnum.FirstHalf;
+    protected Game.GameTimeEnum GameTime = Game.GameTimeEnum.FirstHalf;
     
     public Player(Team PlayerTeam){
         //I wish if this code work but java said constructor must be the first
-        super("PlayerRed.png", 35);
-        
-//        ?(TeamKind == TeamKindEnum.BlueTeam):super("Player", "PlayerBlue.png", 32),super("Player", "PlayerRed.png", 32);
-//        if (TeamKind == TeamKindEnum.BlueTeam){
-//            super("Player", "PlayerBlue.png", 32);
-//        }    
-//        else{
-//            super("Player", "PlayerRed.png", 32);
-//        }
-        
-        //super("PlayerRed.png", 35);
-                
-        bluePlayerImage = new Image(("/img/"+"PlayerBlue.png"));
-        blueUndercontrolPlayerImage = new Image(("/img/"+"PlayerUnderControl.png"));
-        blueNearestPlayerImage = new Image(("/img/"+"PlayerNearest.png"));
-        
-        redPlayerImage = new Image(("/img/"+"PlayerRed.png"));
+        super("PlayerBlack.png", 35);
+                        
+        PlayerImage = new Image(("/img/"+"PlayerBlack.png"));
         
     }
     
+    public Player(){
+        //I wish if this code work but java said constructor must be the first
+        super("PlayerBlack.png", 35);
+                        
+        PlayerImage = new Image(("/img/"+"PlayerBlack.png"));
+        
+    }
+    
+
     @Override
     public void timeTick(){
         /*
@@ -98,20 +82,11 @@ public class Player extends Actor{
         I haven't figured out yet.
         */
         super.timeTick(); 
-        updateImages();
         if (UnCollidable == true) {
             restoreCollidability();
         }
-        if (getPlayerTeamKind() == TeamKindEnum.RedTeam) {
-            redTeamAI();
-        }
-        if (getPlayerTeamKind() == TeamKindEnum.BlueTeam) {
-            blueTeamAI();
-        }
-//        if (keeperSave == true) {
-//            switchOffSave();
-//        }
-        
+
+        updateImages();
         
     }
 
@@ -133,76 +108,7 @@ public class Player extends Actor{
     and the string value in position - if they match, player knows HE is nearestTeamMate, and can "switch on" his yellow
     highlight image thanks to updateImages() method.
     */
-    
-    //AMER CODE: 1 line
-    //@Override
-    //public void setRotationBasedOnSpeed(){
-        //AMER CODE: 1 line
-        //super.setRotationBasedOnSpeed();
         
-        //AMER CODE: BLOCK old code has been commited down
-/*        if (getSpeedY()<0 && getSpeedX()==0){ //going North
-            PlayerDirection = PlayerDirectionEnum.North;
-            getImageView().setRotate(270);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedY()<0 && getSpeedX()>0){ //going NorthEast
-            PlayerDirection = PlayerDirectionEnum.NorthEast;
-            getImageView().setRotate(315);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedY()==0 && getSpeedX()>0){ //going East
-            PlayerDirection = PlayerDirectionEnum.East;
-            getImageView().setRotate(0);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedY()>0 && getSpeedX()>0){ //going South East
-            PlayerDirection = PlayerDirectionEnum.SouthEast;
-            getImageView().setRotate(45);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedY()>0 && getSpeedX()==0){ //going South
-            PlayerDirection = PlayerDirectionEnum.South;
-            getImageView().setRotate(90);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedY()>0 && getSpeedX()<0){ //going SouthWest
-            PlayerDirection= PlayerDirectionEnum.SouthWest;
-            getImageView().setRotate(315);
-            getImageView().setScaleX(-1);
-        }
-        else if (getSpeedY()==0 && getSpeedX()<0){ //going West
-            PlayerDirection= PlayerDirectionEnum.West;
-            getImageView().setRotate(0);
-            getImageView().setScaleX(-1);
-        }
-        else if (getSpeedY()<0 && getSpeedX()<0){ //going NorthWest
-            PlayerDirection= PlayerDirectionEnum.NorthWest;
-            getImageView().setRotate(45);
-            getImageView().setScaleX(-1);
-        }
-*/
-/* old code
-        if (getSpeedY()>0){
-            getImageView().setRotate(90);
-            getImageView().setScaleX(1);
-            
-        }
-        else if (getSpeedY()<0){
-            getImageView().setRotate(270);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedX()>0){
-            getImageView().setRotate(0);
-            getImageView().setScaleX(1);
-        }
-        else if (getSpeedX()<0){
-            getImageView().setRotate(0);
-            getImageView().setScaleX(-1);
-        }
-        */
-    //}
-    
     //AMER CODE: START
     public int getPerfectBallX(){
         
@@ -274,45 +180,30 @@ public class Player extends Actor{
     }
     //AMER CODE: END
     
-    //AMER CODE: redocration and put the new images variable instead of array images
     public void updateImages() {
-        if (getPlayerTeamKind() == TeamKindEnum.BlueTeam) { //will only affect blue team, red team images never need to change
-            if(underControl) {
-                if(!position.contains("Keeper")) {
-                    updateImage(blueUndercontrolPlayerImage);
-                }
-            }
-            else { //player not in Control
-                if(!position.contains("Keeper")) {//not a keeper
-                    if (isNearst() && isMyTeamHaveBall()){
-                        updateImage(blueNearestPlayerImage);
-                    }
-                    else{ // not nearest team mate
-                        updateImage(bluePlayerImage);
-                    }
-                }
-            }
-        }
+
     }
     
     public boolean isNearst(){ //return true in case this object is the neast to the player under control
-        if (nearestTeamMate == this){
+        if (nearestTeamMate == this)
             return true;
-        } else{return false;}
+        else 
+            return false;
     }
     
     public boolean isMyTeamHaveBall(){
         
-        if (teamWithBall == PlayerTeam.getTeamKind()){
+        if (teamWithBall == PlayerTeam.getTeamKind())
             return true;
-        } else{return false;}
+        else
+            return false;
     }
     
-    public void setPosition(String position) {
+    public void setPosition(PlayerPositionEnum position) {
         this.position = position;
     }
     
-    public String getPosition() {
+    public PlayerPositionEnum getPosition() {
         return position;
     }
     
@@ -320,14 +211,6 @@ public class Player extends Actor{
     public void setBall(Ball ball){
         this.ball = ball;
     }
-    
-//    public void setballX(int ballX) {
-//        this.ballX = ballX;
-//    }
-//    
-//    public void setballY(int ballY) {
-//        this.ballY = ballY;
-//    }
     
     public void rightBackDefending() {
         
@@ -354,131 +237,6 @@ public class Player extends Actor{
         else if (ball.getX() > 900 && ball.getY() >= 335) {
             setSpeedX((ball.getX() - getX())/30);
             setSpeedY((250 - getY())/20);
-        }
-    }
-    
-    public void rightBackAttacking() {
-        if (hasBall == true) {
-            if (getX() > 800) {
-                setSpeedY((150 - getY())/20);
-                setSpeedX(-3);
-            }
-            else if(getX() <= 800) {
-                setSpeedX(-1);
-                setSpeedY((150 - getY())/20);
-                autoPass();
-            }
-        }
-        else if (hasBall == false) {
-            if (getX() > 665) {
-                setSpeedX(-3);
-                setSpeedY((150 - getY())/20);
-            }
-            else if (getX() <= 665) {
-                setSpeedX(-1);
-                setSpeedY(0);    
-            }
-        }
-    }
-    
-    public void leftBackDefending() {
-        if (ball.getX() < 500 && ball.getY() < 335) {
-            setSpeedX((ball.getX()+600 - getX())/20);
-            setSpeedY((410 - getY())/20);
-        }
-        else if (ball.getX() < 500 && ball.getY() >= 335) {
-            setSpeedX((ball.getX()+600 - getX())/20);
-            setSpeedY((ball.getY() - getY())/20);
-        }
-        else if (ball.getX() >= 500 && ball.getX() < 900 && ball.getY() < 335) {
-            setSpeedX((ball.getX()+250 - getX())/20);
-            setSpeedY((410 - getY())/20);
-        }
-        else if (ball.getX() >= 500 && ball.getX() < 900 && ball.getY() >= 335) {
-            setSpeedX((ball.getX()+250 - getX())/20);
-            setSpeedY((ball.getY() - getY())/20);
-        }
-        else if (ball.getX() > 900 && ball.getY() < 335) {
-            setSpeedX((ball.getX() - getX())/30);
-            setSpeedY((410 - getY())/30);
-        }
-        else if (ball.getX() > 900 && ball.getY() >= 335) {
-            setSpeedX((ball.getX() - getX())/30);
-            setSpeedY((ball.getY() - getY())/20);
-        }
-            
-    }
-    
-    public void leftBackAttacking() {
-        if (hasBall == true) {
-            if (getX() > 800) {
-                setSpeedY((450 - getY())/20);
-                setSpeedX(-3);
-            }
-            else if(getX() <= 800) {
-                setSpeedX(-1);
-                setSpeedY((450 - getY())/20);
-                autoPass();
-            }
-        }
-        else if (hasBall == false) {
-            if (getX() > 665) {
-                setSpeedX(-3);
-                setSpeedY((450 - getY())/20);
-            }
-            else if (getX() <= 665) {
-                setSpeedX(-1);
-                setSpeedY(0);    
-            }
-        }
-    }
-    
-      public void rightMidfielderDefending() {
-        if (ball.getX() < 500 && ball.getY() < 335) {
-            setSpeedX((ball.getX()+250 - getX())/20);
-            setSpeedY((ball.getY() - getY())/20);
-        }
-        else if (ball.getX() < 500 && ball.getY() >= 335) {
-            setSpeedX((ball.getX()+250 - getX())/20);
-            setSpeedY((250 - getY())/20);
-        }
-        else if (ball.getX() >= 500 && ball.getX() < 900 && ball.getY() < 335) {
-            setSpeedX((ball.getX() - getX())/20);
-            setSpeedY((ball.getY() - getY())/20);
-        }
-        else if (ball.getX() >= 500 && ball.getX() < 900 && ball.getY() >= 335) {
-            setSpeedX((ball.getX()+50 - getX())/20);
-            setSpeedY((250 - getY())/20);
-        }
-        else if (ball.getX() > 900 && ball.getY() < 335) {
-            setSpeedX((ball.getX()-200 - getX())/30);
-            setSpeedY((ball.getY() - getY())/30);
-        }
-        else if (ball.getX() > 900 && ball.getY() >= 335) {
-            setSpeedX((ball.getX()-200 - getX())/30);
-            setSpeedY((250 - getY())/20);
-        }
-    }
-    
-    public void rightMidfielderAttacking() {
-        if (hasBall == true) {
-            if (getX() > 350) {
-                setSpeedY((100 - getY())/20);
-                setSpeedX(-3);
-            }
-            else if(getX() <= 350) {
-                autoPass();
-            }
-        }
-        else if (hasBall == false) {
-            if (getX() > 350) {
-                setSpeedX(-3);
-                setSpeedY((150 - getY())/20);
-            }
-            else if (getX() <= 350) {
-                setSpeedX(-1);
-                setSpeedY(0);    
-            }
         }
     }
     
@@ -509,28 +267,6 @@ public class Player extends Actor{
         }
     }
     
-    public void leftMidfielderAttacking() {
-        if (hasBall == true) {
-            if (getX() > 350) {
-                setSpeedY((550 - getY())/20);
-                setSpeedX(-3);
-            }
-            else if(getX() <= 350) {
-                autoPass();
-            }
-        }
-        else if (hasBall == false) {
-            if (getX() > 350) {
-                setSpeedX(-3);
-                setSpeedY((550 - getY())/20);
-            }
-            else if (getX() <= 350) {
-                setSpeedX(0);
-                setSpeedY(0);    
-            }
-        }
-    }
-    
     public void strikerDefending() {
         if (ball.getX() < 500 && ball.getY() < 335) {
             setSpeedX((ball.getX()+50 - getX())/20);
@@ -558,31 +294,6 @@ public class Player extends Actor{
         }
     }
     
-    public void strikerAttacking() {
-        if (hasBall == true) {
-            if (getX() > 250) {
-                setSpeedY((335 - getY())/20);
-                setSpeedX(-3);
-                autoPass();
-            }
-            else if(getX() <= 250) {
-                setSpeedY((450 - getY())/20);
-                setSpeedX(-1);
-                autoShoot();
-            }
-        }
-        else if (hasBall == false) {
-            if (getX() > 300) {
-                setSpeedX(-3);
-                setSpeedY(0);
-            }
-            else if (getX() <= 300) {
-                setSpeedX(-1);
-                setSpeedY(0);    
-            }
-        }
-    }
-    
     public void keeperDefending() {
         if (GameTime == Game.GameTimeEnum.FirstHalf){
             if (ball.getY() < 335) {
@@ -602,35 +313,6 @@ public class Player extends Actor{
             else if (ball.getY() < 335) {
                 setSpeedX(0);
                 setSpeedY((370 - getY())/30);
-            }
-        }
-    }
-    
-    public void keeperAttacking() {
-        if (hasBall) {
-            autoPass();
-        }
-        else {
-            if (GameTime == Game.GameTimeEnum.FirstHalf){
-                if (ball.getX() < 665) {
-                    setSpeedY((330 - getY())/30);
-                    setSpeedX((1250 - getX())/30);
-                }
-                else if (ball.getX() >= 665) {
-                    setSpeedY((330 - getY())/30);
-                    setSpeedX((1320 - getX())/30);
-                }
-            }
-            else {
-                if (ball.getX() < 665) {
-                    setSpeedY((330 - getY())/30);
-                    setSpeedX((25 - getX())/30);
-                }
-                else if (ball.getX() >= 665) {
-                    setSpeedY((330 - getY())/30);
-                    setSpeedX((0 - getX())/30);
-                }
-
             }
         }
     }
@@ -839,136 +521,6 @@ public class Player extends Actor{
         }
     }
      
-     
-    
-    public void redTeamAI() {
-        if (getTeamWithBall() == TeamKindEnum.BlueTeam) {
-                if (position.contains("RightBack")) {
-                    rightBackDefending();
-                }
-                else if (position.contains("LeftBack")) {
-                    leftBackDefending();
-                }
-                else if (position.contains("RightMidfield")) {
-                    rightMidfielderDefending();
-                }
-                else if (position.contains("LeftMidfield")) {
-                    leftMidfielderDefending();
-                }
-                else if (position.contains("Striker")) {
-                    strikerDefending();
-                }
-                else if (position.contains("Keeper")) {
-                    keeperDefending();
-                }
-            }
-        
-        else if (getTeamWithBall() == TeamKindEnum.RedTeam) {
-                if (position.contains("RightBack")) {
-                    rightBackAttacking();
-                }
-                else if (position.contains("LeftBack")) {
-                    leftBackAttacking();
-                }
-                else if (position.contains("RightMidfield")) {
-                    rightMidfielderAttacking();
-                }
-                else if (position.contains("LeftMidfield")) {
-                    leftMidfielderAttacking();
-                }
-                else if (position.contains("Striker")) {
-                    strikerAttacking();
-                }
-                else if (position.contains("Keeper")) {
-                    keeperAttacking();
-                }       
-            }
-        
-        else if (getTeamWithBall() == TeamKindEnum.NoTeam) {
-                if (position.contains("RightBack")) {
-                    rightBackDefending();
-                }
-                else if (position.contains("LeftBack")) {
-                    leftBackDefending();
-                }
-                else if (position.contains("RightMidfield")) {
-                    rightMidfielderDefending();
-                }
-                else if (position.contains("LeftMidfield")) {
-                    leftMidfielderDefending();
-                }
-                else if (position.contains("Striker")) {
-                    strikerDefending();
-                }
-                else if (position.contains("Keeper")) {
-                    keeperDefending();
-                }
-            }
-    }
-    
-    public void blueTeamAI() {
-        if (getTeamWithBall() == TeamKindEnum.BlueTeam) {
-            if (underControl == false) {
-                if (position.contains("RightBack")) {
-                    blueRightBackAttack();
-                }
-                else if (position.contains("LeftBack")) {
-                    blueLeftBackAttack();
-                }
-                else if (position.contains("CentreMidfield")) {
-                    centreMidfieldAttack();
-                }
-                else if (position.contains("InsideRight")) {
-                    insideRightAttack();
-                }
-                else if (position.contains("InsideLeft")) {
-                    insideLeftAttack();
-                }
-                
-            }
-        }
-        else if (getTeamWithBall() == TeamKindEnum.RedTeam) {
-            if (underControl == false) {
-                if (position.contains("RightBack")) {
-                    blueRightBackDefend();
-                }
-                else if (position.contains("LeftBack")) {
-                    blueLeftBackDefend();
-                }
-                else if (position.contains("CentreMidfield")) {
-                    centreMidfieldDefend();
-                }
-                else if (position.contains("InsideRight")) {
-                    insideRightDefend();
-                }
-                else if (position.contains("InsideLeft")) {
-                    insideLeftDefend();
-                }
-                
-            }
-         }
-    }
-//    AMER CODE: no need for these     
-//    public void setcontrolImage() {
-//        updateImage(blueTeamimages[1]);
-//    }
-//    
-//    public void setstandardImage() {
-//        updateImage(blueTeamimages[0]);
-//    }
-//    
-//    public void setKeepercontrolImage() {
-//        updateImage(redTeamimages[2]);
-//    }
-//    
-//    public void setKeeperstandardImage() {
-//        updateImage(blueTeamimages[2]);
-//    }
-//    
-//    public void setNearestTeamMateImage() {
-//        updateImage(blueTeamimages[3]);
-//    }
-    
     public void setHasBall(boolean hasBall) {
         this.hasBall = hasBall;
     }
@@ -985,22 +537,6 @@ public class Player extends Actor{
 //        return onRedTeam;
 //    }
 //    
-    public void setPass(boolean pass) {
-        this.pass = pass;
-    }
-    
-    public boolean getPass() {
-        return pass;
-    }
-    
-    public void setShoot(boolean shoot) {
-        this.shoot = shoot;
-    }
-    
-    public boolean getShoot() {
-        return shoot;
-    }
-    
     public void setUnderControl(boolean underControl) {
     
         this.underControl = underControl;
@@ -1022,14 +558,6 @@ public class Player extends Actor{
         return nearestTeamMate;
     }
     
-    public void setNearestDefender(String nearestDefender) {
-        this.nearestDefender = nearestDefender;
-    }
-    
-    public String getNearestDefender() {
-        return nearestDefender;
-    }
-    
     public void setUnCollidable(boolean UnCollidable) {
         this.UnCollidable = UnCollidable;
     }
@@ -1043,26 +571,6 @@ public class Player extends Actor{
         if (collidabilitycounter == 30) {
             UnCollidable = false;
             collidabilitycounter = 0;
-        }
-    }
-    
-    public void autoPass() {
-        passcounter++;
-        if (passcounter == 40) {
-            UnCollidable = true;
-            pass = true;
-            passcounter = 0;
-            hasBall = false;
-        }
-    }
-    
-    public void autoShoot() {
-        shotcounter++;
-        if (shotcounter == 60) {
-            UnCollidable = true;
-            shoot = true;
-            shotcounter = 0;
-            hasBall = false;
         }
     }
     

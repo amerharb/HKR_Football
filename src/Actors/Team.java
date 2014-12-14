@@ -36,7 +36,7 @@ public class Team
         return teamKind;
     }
     
-    public GoalKeeper getKeeper(){
-        return (GoalKeeper)Players[5];
-    }
+//    public HumanGoalKeeper getKeeper(){
+//        return (HumanGoalKeeper)Players[5];
+//    }
 }

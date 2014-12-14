@@ -168,4 +168,16 @@ public class Ball extends Actor{
         return unCollidable;
     }
 
+    public void gotoPlayer(Player player)
+    {
+        setSpeedX((player.getX() - getX())/30);
+        setSpeedY((player.getY() - getY())/30);
+    }
+
+    public void TravelWithPlayer(Player player)
+    {
+        setSpeedX(player.getSpeedX());
+        setSpeedY(player.getSpeedY());
+    }
+
 }
